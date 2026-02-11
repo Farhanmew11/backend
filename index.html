@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <h1>Hello there, how are you doing my friend Farhan?</h1>
+    
+    <input type="text" placeholder="First Name" id="firstname">
+    <input type="text" placeholder="Last Name" id="lastname">
+    <button id="bum">Send Data</button>
+
+
+
+    <h1>Search for user</h1>
+    <hr>
+    <input type="text" placeholder="Enter user id" id="userId">
+    <button id="searchBtn">Search</button>
+    <button id="listBtn">List All</button>
+    <pre id="result"></pre>
+
+<script>
+    // 2. Get the button element
+    let buttonclick = document.getElementById("bum");
+
+    // 3. Define the function properly
+    const senddata = () => {
+        // Grab the CURRENT values from the inputs
+        let fname = document.getElementById("firstname").value;
+        let lname = document.getElementById("lastname").value;
+
+        axios.post('http://localhost:3001/h', {
+            firstname: fname,
+            lastname: lname
+        })
+        .then(function (response) {
+            console.log("Success:", response.data);
+        })
+        .catch(function (error) {
+            console.error("Error:", error);
+        });
+    };
+    const resultEl = document.getElementById("result");
+    const searchBtn = document.getElementById("searchBtn");
+    const listBtn = document.getElementById("listBtn");
+
+    const showResult = (data) => {
+        resultEl.textContent = JSON.stringify(data, null, 2);
+    };
+
+    const getUserById = () => {
+        const userId = document.getElementById("userId").value.trim();
+        if (!userId) {
+            showResult({ error: "Please enter a user id." });
+            return;
+        }
+
+        axios.get(`http://localhost:3001/users/${userId}`)
+            .then((response) => {
+                showResult(response.data);
+            })
+            .catch((error) => {
+                const data = error.response ? error.response.data : { error: error.message };
+                showResult(data);
+            });
+    };
+
+    const getAllUsers = () => {
+        axios.get("http://localhost:3001/users")
+            .then((response) => {
+                showResult(response.data);
+            })
+            .catch((error) => {
+                const data = error.response ? error.response.data : { error: error.message };
+                showResult(data);
+            });
+    };
+
+    // Attach event listeners
+    buttonclick.onclick = senddata;
+    searchBtn.onclick = getUserById;
+    listBtn.onclick = getAllUsers;
+</script>
+
+</body>
+</html>
